@@ -63,7 +63,11 @@ $ python src/main.py
 
 ## 📌 Future Improvements Planned
 
-- Add UI for non-technical users
+- Add UI for non-technical users (Completed)
+
+Here is the sample UI image with terminal logs within the WebAPP.
+### ![UI](images/UI.PNG)
+
 - Expand data sources beyond 10-Q
 - More sophisticated competitor analysis
 - Add vector database for persistent RAG
