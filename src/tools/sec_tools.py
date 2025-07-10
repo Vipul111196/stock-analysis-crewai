@@ -30,15 +30,11 @@ class SEC10KTool(RagTool):
     args_schema: Type[BaseModel] = SEC10KToolSchema
 
     def __init__(self, stock_name: Optional[str] = None, **kwargs):
-        print("enter init")
-        # exit()
         super().__init__(**kwargs)
         if stock_name is not None:
             content = self.get_10k_url_content(stock_name)
             if content:
                 self.add(content)
-                # print("exit init")
-                # exit()
                 self.description = f"A tool that can be used to semantic search a query from {stock_name}'s latest 10-K SEC form's content as a txt file."
                 self.args_schema = FixedSEC10KToolSchema
                 self._generate_description()
@@ -111,8 +107,6 @@ class SEC10QTool(RagTool):
     args_schema: Type[BaseModel] = SEC10QToolSchema
 
     def __init__(self, stock_name: Optional[str] = None, **kwargs):
-        print("enter init")
-        # exit()
         super().__init__(**kwargs)
         if stock_name is not None:
             content = self.get_10q_url_content(stock_name)
