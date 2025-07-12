@@ -1,19 +1,14 @@
-from typing import List
+import os
+from dotenv import load_dotenv
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-
+from crewai_tools import WebsiteSearchTool, ScrapeWebsiteTool
+from langchain_openai import ChatOpenAI
 from tools.calculator_tool import CalculatorTool
 from tools.sec_tools import SEC10KTool, SEC10QTool
 
-from crewai_tools import WebsiteSearchTool, ScrapeWebsiteTool, TXTSearchTool
-import os
-from dotenv import load_dotenv
 load_dotenv()
 
-api_key = os.getenv("OPENAI_API_KEY")
-
-from langchain_openai import ChatOpenAI
-llm = ChatOpenAI(api_key= api_key, model="gpt-4o-mini")
 
 @CrewBase
 class StockAnalysisCrew:
@@ -22,13 +17,17 @@ class StockAnalysisCrew:
 
     def __init__(self, company_symbol="AMZN"):
         self.company_symbol = company_symbol
+        self.llm = ChatOpenAI(
+            api_key=os.getenv("OPENAI_API_KEY"),
+            model="gpt-4o-mini",
+        )
 
     @agent
     def research_analyst_agent(self) -> Agent:
         return Agent(
             config=self.agents_config['research_analyst'],
             verbose=True,
-            llm=llm,
+            llm=self.llm,
             tools=[
                 ScrapeWebsiteTool(),
                 SEC10QTool(self.company_symbol),
@@ -41,7 +40,7 @@ class StockAnalysisCrew:
         return Agent(
             config=self.agents_config['financial_analyst'],
             verbose=True,
-            llm=llm,
+            llm=self.llm,
             tools=[
                 ScrapeWebsiteTool(),
                 WebsiteSearchTool(),
@@ -56,7 +55,7 @@ class StockAnalysisCrew:
         return Agent(
             config=self.agents_config['investment_advisor'],
             verbose=True,
-            llm=llm,
+            llm=self.llm,
             tools=[
                 ScrapeWebsiteTool(),
                 WebsiteSearchTool(),
@@ -73,7 +72,7 @@ class StockAnalysisCrew:
         )
 
     @task
-    def financial_analysis(self) -> Task: 
+    def financial_analysis(self) -> Task:
         return Task(
             config=self.tasks_config['financial_analysis'],
             agent=self.financial_analyst_agent(),
