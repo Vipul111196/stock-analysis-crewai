@@ -1,6 +1,11 @@
 .env
 .DS_Store
-__pycache__
+__pycache__/
+*.pyc
 poetry.lock
-tools/__pycache__
-db
+db/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
