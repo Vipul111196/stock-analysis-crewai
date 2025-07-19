@@ -1,80 +1,113 @@
-# 📈 Stock Analysis with AI Agents using CrewAI 🚀
+# Stock Analysis with AI Agents — CrewAI
 
-This project demonstrates how to build a collaborative AI agent system to generate stock investment reports using [CrewAI](https://github.com/joaomdmoura/crewAI). It utilizes a team of AI agents — a Research Analyst, Financial Analyst, and Investment Advisor — who work together to analyze financial data, regulatory filings, and market sentiment to provide actionable investment insights.
+Multi-agent stock analysis system that generates detailed investment reports. Three specialized AI agents (Research Analyst, Financial Analyst, Investment Advisor) collaborate to analyze SEC filings, financial data, and market sentiment.
 
-## 🧠 Agents Overview
+![UI](images/UI.PNG)
 
-The Crew includes three specialized agents:
+## How It Works
 
-- **Research Analyst**  
-  Gathers background information, news, and insights about the selected company.
-
-- **Financial Analyst**  
-  Analyzes financial statements such as 10-Q filings and compares performance with competitors.
-
-- **Investment Advisor**  
-  Compiles all findings into an investment recommendation report.
-
-Each agent has its own role, backstory, and tools, and can delegate tasks and communicate with other agents to enhance analysis quality.
-
-## 🛠️ Features
-
-- ✅ Built with CrewAI
-- ✅ Custom AI agents with specific goals and tools
-- ✅ Multi-agent collaboration and task delegation
-- ✅ Retrieval-Augmented Generation (RAG) system for 10-Q filing analysis
-- ✅ Generates a detailed stock investment report
-- ✅ Input via stock ticker or company name (e.g., "TSLA" or "Tesla")
-
-## 📊 Example Output
-
-The final report includes:
-
-- Company financial health
-- Revenue, profitability, and geographic performance
-- Market sentiment and regulatory risks
-- Competitive analysis
-- Insider trading activity
-- Upcoming events (e.g., earnings calls)
-- Final investment recommendation
-
-## 🚀 How to Run
-
-1. Clone the repository
-2. Install dependencies
-3. Run the main script
-4. Enter the stock ticker or company name when prompted
-
-```bash
-$ git clone https://github.com/Vipul111196/stock-analysis-crewai.git
-$ cd stock-analysis-crewai
-$ pip install -r requirements.txt
-$ python src/main.py
+```
+User Input (ticker/company name)
+        |
+        v
+  Research Analyst ──> gathers news, market sentiment, upcoming events
+        |
+        v
+  Financial Analyst ──> analyzes 10-K/10-Q filings, financial metrics, competitors
+        |
+        v
+  Investment Advisor ──> synthesizes everything into a recommendation report
+        |
+        v
+  Final Report (saved to output/)
 ```
 
-## 📂 Tech Stack
+**Agents and their tools:**
 
-- Python 🐍
-- CrewAI 🚣
-- LangChain 🔗
-- OpenAI  🧠
-- Financial document parsing (SEC 10-Q)
-- Basic RAG setup for document embedding & retrieval
+| Agent | Role | Tools |
+|---|---|---|
+| Research Analyst | News, sentiment, events | SEC 10-Q/10-K RAG, Web Scraper |
+| Financial Analyst | Financial health, filings | SEC 10-Q/10-K RAG, Web Search, Calculator |
+| Investment Advisor | Final recommendation | Web Search, Web Scraper, Calculator |
 
-## 📌 Future Improvements Planned
+The agents run sequentially via CrewAI's orchestration — each agent's output feeds into the next.
 
-- Add UI for non-technical users (Completed)
+## Tech Stack
 
-Here is the sample UI image with terminal logs within the WebAPP.
-### ![UI](images/UI.PNG)
+- **Agent Framework:** CrewAI with LangChain
+- **LLM:** OpenAI GPT-4o-mini
+- **Data Sources:** SEC EDGAR (10-K, 10-Q filings via sec-api), web scraping
+- **RAG:** Document embedding + semantic search over SEC filings
+- **Frontend:** Streamlit (two modes: simple + real-time agent logs)
+- **Infrastructure:** Docker, docker-compose
 
-- Expand data sources beyond 10-Q
-- More sophisticated competitor analysis
-- Add vector database for persistent RAG
-- Report export as PDF or HTML
+## Quick Start
 
-## 📄 License
+### Local
 
-MIT License
+```bash
+git clone https://github.com/Vipul111196/stock-analysis-crewai.git
+cd stock-analysis-crewai
 
+# Setup
+cp .env.example .env    # add your API keys
+pip install -r requirements.txt
 
+# CLI mode
+make run
+
+# Streamlit UI
+make ui
+
+# Streamlit UI with real-time agent logs
+make ui-logs
+```
+
+### Docker
+
+```bash
+cp .env.example .env    # add your API keys
+make docker-up          # runs at http://localhost:8501
+```
+
+## API Keys Required
+
+| Key | Source | Used For |
+|---|---|---|
+| `OPENAI_API_KEY` | [OpenAI Platform](https://platform.openai.com/) | LLM for all agents |
+| `SEC_API_API_KEY` | [SEC API](https://sec-api.io/) | Fetching 10-K/10-Q filings from EDGAR |
+
+## Project Structure
+
+```
+stock-analysis-crewai/
+├── src/
+│   ├── config/
+│   │   ├── agents.yaml          # Agent roles, goals, backstories
+│   │   └── tasks.yaml           # Task descriptions and expected outputs
+│   ├── tools/
+│   │   ├── sec_tools.py         # SEC 10-K/10-Q RAG tools
+│   │   └── calculator_tool.py   # Safe arithmetic evaluator
+│   ├── crew.py                  # CrewAI orchestration
+│   ├── main.py                  # CLI entry point
+│   ├── app.py                   # Streamlit UI (simple)
+│   ├── app_with_logs.py         # Streamlit UI (with agent logs)
+│   └── utils.py                 # Shared ticker resolution logic
+├── output/                      # Generated analysis reports
+├── images/                      # UI screenshots
+├── Dockerfile
+├── docker-compose.yml
+├── Makefile
+├── requirements.txt
+└── .env.example
+```
+
+## Example Output
+
+Reports are saved to `output/<TICKER>_analysis.txt`. See [AAPL analysis](output/AAPL_analysis.txt) and [MSFT analysis](output/MSFT_analysis.txt) for examples.
+
+Each report covers: financial health, revenue trends, P/E ratio, EPS growth, competitive analysis, insider trading activity, upcoming events, and a final investment recommendation.
+
+## License
+
+MIT
